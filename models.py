@@ -1,15 +1,26 @@
-"""
-Crear un modelo de tabla de prueba.
-"""
+from extensions import db
+from sqlalchemy import ForeignKey
 
-# app es un modulo creado en el programa principal del gestor de tareas
-# db es un método del módulo app, también creado en el programa principal
-from app import db
 
-# Definir Tabla
 class Usuario(db.Model):
 
-    # columna primaria con tipo de dato = integer
+    __tablename__ = "usuario"
+    tareas = db.relationship('Tarea')
     id = db.Column(db.Integer, primary_key=True)
-    # columna con tipo de dato string, no se puede omitir
-    nombre = db.Column(db.String(100), nullable=False)
+    nombre = db.Column(db.String(100), nullable=False, unique=True)
+    email = db.Column(db.String(50), nullable=False, unique=True)
+    clave_encriptada = db.Column(db.String(128), nullable=False)
+    
+    def __repr__(self):
+        return f'<Usuario {self.nombre}>'
+
+class Tarea(db.Model):
+
+    __tablename__ = "tarea"
+    id = db.Column(db.Integer, primary_key=True)
+    tarea_nombre = db.Column(db.String(100), nullable=False, unique=True)
+    usuario_id = db.Column(db.Integer, ForeignKey('usuario.id'))
+    
+
+    def __repr__(self):
+        return f'<Tarea {self.tarea_nombre}>'

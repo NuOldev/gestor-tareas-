@@ -140,3 +140,44 @@ _____________________________________________________________________
 - Aprender a registrar un usuario con contraseña encriptada
 
 ### Nota: borrar tareas.db mientras se crea el programa es válido, pero no es una opción en un proyecto real con datos y usuarios reales. La herramienta Flask-Migrate modifica sin borrardatos y en su momento aprenderé a usar esta nueva herramienta.
+
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+### Archivos a crear ###
+
+templates/
+  |----registro.html
+
+- registro.html:
+    * formulario con 3 campos:
+        - correo
+        - contraseña
+        - confirmación de contraseña
+    * detalles:
+        - titulo de formulario: Formulario de Registro
+        - label: correo + input > required + alerta si el campo no coincide con un coreo válido
+        - label: contraseña + input > required
+        - label: confirmación + input > required + alerta si este no coincide con la primera contraseña
+        - botón: submit > envía datos + enlaza a nueva página (login)
+        - Formulario sencillo, los estilos no son prioridad pero se debe crear con bases solidas de accesibilidad.
+
+- app.py:
+    * from extensions import db, bcrypt *acceso a instancia bcrypt > extension.py*
+    * bcrypt.init_app(app) *listo para trabajar con la app y encriptar los datos obtenidos*
+    * @app.route('/registro', methods=['GET', 'POST']) *ruta al formulario*
+    * def formulario_de_registro(): *función para la lógica del formulario de registro*
+    * detalles:
+        - se procesan los datos ingresados por el usuario
+        - se recibie la contraseña y se pide confirmación
+        - si coinciden las contraseñas se encripta
+        - se guarda la contraseña encriptada
+        - se manejan los errores si los datos no coinciden
+        - se redirige a la siguiente página 'formulario de ingreso' 
+
+- extensions.py:
+    * from flask_bcrypt import Bcrypt *se intaló pip Flask-Bcrypt > se importa como instancia*
+    * bcrypt = Bcrypt() *Se crea la instancia que se ligará a la app*
+
+- requirements.txt:
+    * Flask-Bcrypt==1.0.1 *Instalación del encriptador de flask*

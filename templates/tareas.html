@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tareas</title>
+
+</head>
+<body>
+    
+    <div class="contenedor-formulario">
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                {% for categoria, mensaje in mensajes %}
+                    <div class="alert {{ categoria }}">{{ mensaje }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="post" action="/">
+            <input type="text" name="nombre" placeholder="Escribe un nombre: (ej: James)">
+            <input type="text" name="tarea" placeholder="Escribe la tarea asignada: (ej barrer)">
+            <button type="submit">➕ Añadir Usuario</button>
+        </form>
+    </div>
+
+    <!-- Lista de usuarios -->
+    <h2>📋Lista actual:</h2>
+    <ul>
+        {% for u in usuarios%}
+        <li>🆔 {{ u.id }} - {{ u.nombre }}</li>
+        <li>Tarea - {% for t in u.tareas %} {{t.tarea_nombre}} {% endfor %}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -12,7 +12,9 @@
 * Fecha de Fin de proyecto > 08-05-2026 (aproximado)
 * Tiempo de trabajo por semana > 5 horas (aproximado) 
 
+
 _____________________________________________________________________
+
 
 ### Nota: no he registrado las primeras fechas de trabajo, hoy es 15-04-2026 y comenzaré por registrar brevemente lo que he aprendido, buscaré la ayuda de GEMINI para que verifique si mis conocimientos son acertados y modificar o afinar estos para que estos apuntes sean claros y certeros.
 
@@ -144,7 +146,7 @@ _____________________________________________________________________
 
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-### Archivos a crear ###
+### Archivos a crear y modificaciones en app.py###
 
 templates/
   |----registro.html
@@ -176,8 +178,84 @@ templates/
         - se redirige a la siguiente página 'formulario de ingreso' 
 
 - extensions.py:
-    * from flask_bcrypt import Bcrypt *se intaló pip Flask-Bcrypt > se importa como instancia*
+    * from flask_bcrypt import Bcrypt *se instaló Flask-Bcrypt*
     * bcrypt = Bcrypt() *Se crea la instancia que se ligará a la app*
 
 - requirements.txt:
     * Flask-Bcrypt==1.0.1 *Instalación del encriptador de flask*
+
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+### 24-04-2026 -> 
+
+- app.py:
+    * @app.route('/', methods=['GET', 'POST']) *ruta raíz: página de ingreso*
+    * def login(): *solicita credenciales, verifica y permite el ingreso*
+    * return render_template('index.html') *renderiza la página de ingreso*
+    * @app.route('/tareas', methods=['GET','POST']) *2a ruta: página de tareas*
+    * def formulario_de_tareas(): *Registra y guarda usuario y tarea asignada*
+    * return redirect(url_for('formulario_de_tareas')) *redirige a la misma función*
+    * return render_template('tareas.html', usuarios=lista_usuarios, tareas=lista_tareas) *renderiza la página lista para agregar nuevos datos*
+
+_____________________________________________________________________
+
+# Alcance del proyecto # 28-04-2026
+
+- MVP:
+    * Registro
+    * Login
+    * Crear tarea
+    * Agregar más tareas por usuario
+    * Borrar tarea
+    * Cerrar sesión 
+
+- V2:
+    * Ajustes: 
+        - Modo nocturno
+    * Mostrar lista de tareas (añadir filtros)
+    * Agregar tiempo (temporizador) a una tarea
+    * Alerta de sesión terminada
+    * Felicitación por tarea terminada
+    * Pedir calificación (despues de un tiempo determinado de uso)
+
+_____________________________________________________________________
+
+Rubber Duck Debuggin -> app.py
+
+- def login()
+
+    * La función login sirve para permitir la entrada al programa principal despues de que los datos se verificaron en el formulario de registro.
+    * Esta ejecuta una condición para saber si el método seleccionado por el usuario es POST o GET:
+        if request.method == 'POST': (recordando que; GET = solicitar ver la página y POST = enviar datos)
+    * Esta si la condición se cumple se reciben dos datos:
+            correo = request.form.get('email').strip()
+            password = request.form.get('contraseña').strip()
+    * Se ejecuta una nueva condición enviando una alerta si uno o ambos datos no fueron enviados:
+            if not correo or not password:
+                flash("El correo o contraseña no pueden estar vacíos!")
+    * Si fueron enviados:
+            else:
+    * Se busca el correo en la base de datos creando una instancia del modelo que permite el acceso a sus atributos/columnas, haciendo un consulta y filtrando por la variable que es el nombre del atributo/columna (email) y su valor que es el correo que ingresó el usuario (correo):
+                usuario = Usuario.query.filter_by(email=correo)
+    * Se crea una nueva condición para saber si la respuesta es None, que significa que ese correo no existe en la base de datos, y se envía una alerta y se regresa a la página de login con un return para que no continúe al siguiente paso que es la verificación de la contraseña, esto como antes había aprendido se combina con un render_template('index.html') que se usa cuando un paso no fue exitoso y que renderiza o muestra la página deseada que en este caso es (index.html) o lo que significa mostrar la misma página vacía:
+                if usuario == None:
+                    flash()
+                    return render_template('index.html')
+    * Si la respuesta de la condición anterior no es None significa que regresa una respuesta (True) y se salta el bloque de la condición para seguir con el proceso que es verificar con la herramienta bcrypt si la contraseña encriptada corresponde con la contraseña que fue previamente guardada, esto se logracreando una variable para contener el resultado, dentro se apunta a bcrypt y su herramienta para checar hashes que recibe dos (2) argumentos;
+        1. El nombre de la columna que contiene las claves encriptadas (clave_encriptada) accediendo a ella por medio de la instancia antes creada (usuario.) que aunque se usó para filtrar (email) en ese momento, ya se puede acceder a cualquier atributo/columna  
+                contrasena = bcrypt.check_password_hash(usuario.clave_encriptada,........)
+        2. la contraseña ingresada por el usuario para hacer internamente una comparación con la clave encriptada que se guardó, esta no se puede encriptar nuevamente por que se obtiene una clave nueva y jamás coincidirían, pero esta herramienta lo hace internamente, compara y devuelve True o False 
+                contrasena = bcrypt.check_password_hash(........, password)
+    * Se crea una nueva condición para que dependiendo de la respuesta de la comparación anterior se envíe una alerta de éxito y se permita el acceso a la página de formulario de tareas haciendo una redirección con un return para salir de la función o se regrese al formulario de acceso (login o '/') vacío para que se permita ingresar los datos nuevamente:
+                if contrasena: -> respuesta True
+                    flash("Acceso correcto", "éxito")
+                    return redirect(url_for('formulario de tareas'))
+
+    * Respuesta False:
+        return render_template('index.html')
+    
+
+PRG:
+- Post → Redirect → Get
+    - La idea es: después de un POST, siempre redirigir en lugar de renderizar directamente. Así si el usuario recarga la página, no reenvía el formulario y no duplica datos.

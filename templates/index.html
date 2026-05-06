@@ -6,6 +6,22 @@
     <title>Login</title>
 </head>
 <body>
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                {% for mensaje in mensajes %}
+                    <div class="alert">{{ mensaje }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    <form action="/" method="post">
+        <label for="email">Correo electrónico </label>
+        <input type="email" name="email" id="email" placeholder="gestor@login.com" required>
+        <label for="password">Contraseña</label>
+        <input type="password" name="password" id="password" placeholder="contraseña" required>
+        <button type="submit" name="submit" id="submit">Login</button>
+        <p><a href="/registro">registrarme</a></p>
+    </form>
     
 </body>
 </html>
